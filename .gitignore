@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Ignore dataset folders
+1-covid
+2-other-viruses
+3-multi-class
+4-new-sequences
+processed
+results
