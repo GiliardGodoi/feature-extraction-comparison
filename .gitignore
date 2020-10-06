@@ -128,6 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# .vscode local configurations
+.vscode
+
 # Ignore dataset folders
 1-covid
 2-other-viruses
