@@ -142,7 +142,7 @@ def save_measures(classifier, foutput, scores):
 
 def evaluate_model_holdout(classifier, model, finput):
 	df = pd.read_csv(finput)	
-	labels = df['label']
+	labels = df.iloc[:, -1]
 	features = df[df.columns[1:(len(df.columns) - 1)]]
 	print(features)
 	print(labels)
@@ -177,10 +177,16 @@ def evaluate_model_holdout(classifier, model, finput):
 
 def evaluate_model_cross(classifier, model, finput):
 	#####################################
-	df = pd.read_csv(finput, header=None)	
+	header = pd.read_csv(finput, header=None, nrows=1)
+	if header.iloc[0, 0] == "nameseq":
+		df = pd.read_csv(finput)
+	else:
+		df = pd.read_csv(finput, header=None)
 	X = df[df.columns[1:(len(df.columns) - 1)]]
 	print(X)
-	y = df['label']
+	# X = df.iloc[:, 1:-1]
+	y = df.iloc[:, -1]
+	# y = df['label']
 	print(y)
 	#####################################
 	pipe = Pipeline(steps=[
