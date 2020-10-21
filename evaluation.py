@@ -12,7 +12,7 @@ warnings.filterwarnings("ignore")
 import pandas as pd
 import numpy as np
 
-from catboost import *
+# from catboost import *
 from catboost import CatBoostClassifier
 
 from sklearn import preprocessing
@@ -38,7 +38,7 @@ from sklearn.linear_model import SGDClassifier
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.neighbors.nearest_centroid import NearestCentroid
+from sklearn.neighbors import NearestCentroid
 from sklearn.neural_network import MLPClassifier
 
 from sklearn import svm
@@ -189,6 +189,8 @@ def calculate_results(index, classifier, scores):
         round(scores['test_ACC_B'].std(), 2),
         round(scores['test_kappa'].mean(), 4),
         round(scores['test_kappa'].std(), 2),
+        round(scores['test_gmean'].mean(), 4),
+        round(socres['test_gmean'].std(),2)
     ]
 
     return results
@@ -280,30 +282,44 @@ if __name__ == "__main__":
     foutput = str(args.output)
 
     experiments = {
-        # "GaussianNB": GaussianNB(),
-        # "DecisionTree": DecisionTreeClassifier(criterion='gini', max_depth=2, max_leaf_nodes=None, random_state=63),
+        "GaussianNB": GaussianNB(),
+        "DecisionTree": DecisionTreeClassifier(criterion='gini', max_depth=2, max_leaf_nodes=None, random_state=63),
         # "RandomForest": RandomForestClassifier(random_state=63, n_estimators=100),
         # "LogisticRegression": LogisticRegression(multi_class="multinomial", solver="lbfgs", C=5),
         # "SVM": svm.SVC(gamma='scale', kernel='poly', degree=5, coef0=0.1, random_state=63),
-        "Bagging": BaggingClassifier(random_state=63),
-        "KNN": KNeighborsClassifier(),
-        "MLP": MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(100, 2), learning_rate_init=0.001, random_state=63),
-        "Adaboost": AdaBoostClassifier(random_state=63),
-        "Catboost": CatBoostClassifier(iterations=100, random_seed=63, logging_level='Silent'),
-        "GradientBoosting": GradientBoostingClassifier(n_estimators=400, learning_rate=3.0, max_depth=1, random_state=63),
-        "HistGradientBoosting": HistGradientBoostingClassifier(random_state=63)
+        # "Bagging": BaggingClassifier(random_state=63),
+        # "KNN": KNeighborsClassifier(),
+        # "MLP": MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(100, 2), learning_rate_init=0.001, random_state=63),
+        # "Adaboost": AdaBoostClassifier(random_state=63),
+        # "Catboost": CatBoostClassifier(iterations=100, random_seed=63, logging_level='Silent'),
+        # "GradientBoosting": GradientBoostingClassifier(n_estimators=400, learning_rate=3.0, max_depth=1, random_state=63),
+        # # "HistGradientBoosting": HistGradientBoostingClassifier(random_state=63)
     }
+
+    classifiers = [
+        "GaussianNB",
+        "DecisionTree"#,
+        # "RandomForest",
+        # "LogisticRegression",
+        # "SVM",
+        # "Bagging",
+        # "KNN",
+        # "MLP",
+        # "Adaboost",
+        # "Catboost",
+        # "GradientBoosting",
+        # "HistGradientBoosting"
+    ]
 
     print("Input:  ", finput)
     print("Output:  ", foutput)
 
-    frame = read_dataset(finput)
+    trial = 6
 
-    for trial in range(6, 7, 1):
-
-        print("Round: %s" % (trial))
-
-        for classifier, model in experiments.items():
-            evaluate_model_cross(trial, classifier, model,
-                                 frame.copy(), foutput)
-            # evaluate_model_holdout(classifier, model, finput)
+    for classifier in classifiers:
+        model = experiments.pop(classifier)
+        frame = read_dataset(finput)
+        evaluate_model_cross(trial, classifier, model, frame, foutput)
+        # evaluate_model_holdout(classifier, model, finput)
+        del frame
+        del model
